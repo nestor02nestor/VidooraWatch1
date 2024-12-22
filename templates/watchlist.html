@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قائمة المشاهدة</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .movie-card {
+            position: relative;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .movie-poster {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .movie-poster img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .movie-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.3) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: flex-end;
+            padding: 20px;
+        }
+        
+        .movie-card:hover .movie-overlay {
+            opacity: 1;
+        }
+        
+        .movie-card:hover img {
+            transform: scale(1.1);
+        }
+        
+        .movie-info {
+            color: white;
+            width: 100%;
+        }
+        
+        .movie-info h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .movie-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-watch {
+            background-color: #e50914;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-watch:hover {
+            background-color: #f40612;
+            color: white;
+        }
+        
+        .movie-rating {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #ffd700;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand" href="{{ url_for('index') }}">موقع الأفلام</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">الرئيسية</a>
+                    </li>
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('user_watchlist') }}">
+                            <i class="bi bi-bookmark"></i>
+                            قائمة المشاهدة
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('user_notifications') }}">
+                            <i class="bi bi-bell"></i>
+                            الإشعارات
+                            <span class="badge bg-danger notifications-count" style="display: none;">0</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% for category in categories %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('category', id=category.id) }}">{{ category.name }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <div class="d-flex">
+                    <div class="search-container me-3">
+                        <input type="text" id="searchInput" class="form-control bg-dark text-white" placeholder="ابحث عن فيلم...">
+                        <div id="searchResults" class="search-results"></div>
+                    </div>
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('logout') }}" class="btn btn-outline-light">تسجيل خروج</a>
+                    {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-light">تسجيل دخول</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid px-4 mt-5 pt-4">
+        <h1 class="text-white mb-4">قائمة المشاهدة</h1>
+        
+        {% if movies %}
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
+            {% for movie in movies %}
+            <div class="col">
+                <div class="movie-card">
+                    <div class="movie-poster">
+                        <a href="{{ url_for('watch', id=movie.id) }}">
+                            {% if movie.average_rating > 0 %}
+                            <div class="movie-rating">
+                                <i class="bi bi-star-fill"></i> {{ "%.1f"|format(movie.average_rating) }}
+                            </div>
+                            {% endif %}
+                            <img src="{{ movie.image_url }}" alt="{{ movie.title }}" loading="lazy">
+                        </a>
+                        <div class="movie-overlay">
+                            <div class="movie-info">
+                                <h3>{{ movie.title }}</h3>
+                                <div class="movie-buttons">
+                                    <a href="{{ url_for('watch', id=movie.id) }}" class="btn btn-watch">
+                                        <i class="bi bi-play-fill"></i>
+                                        <span>مشاهدة</span>
+                                    </a>
+                                    <button class="btn btn-danger remove-from-watchlist" data-movie-id="{{ movie.id }}">
+                                        <i class="bi bi-x-circle"></i>
+                                        <span>إزالة</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center text-white mt-5">
+            <i class="bi bi-collection-play display-1 mb-3"></i>
+            <h2>قائمة المشاهدة فارغة</h2>
+            <p>لم تقم بإضافة أي أفلام إلى قائمة المشاهدة بعد</p>
+            <a href="{{ url_for('index') }}" class="btn btn-primary mt-3">
+                <i class="bi bi-house-fill"></i>
+                العودة إلى الصفحة الرئيسية
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // إزالة فيلم من قائمة المشاهدة
+        document.querySelectorAll('.remove-from-watchlist').forEach(button => {
+            button.addEventListener('click', function() {
+                const movieId = this.dataset.movieId;
+                const movieCard = this.closest('.col');
+                
+                fetch(`/watchlist/remove/${movieId}`, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // إزالة العنصر بتأثير متلاشي
+                        movieCard.style.transition = 'opacity 0.3s ease';
+                        movieCard.style.opacity = '0';
+                        setTimeout(() => {
+                            movieCard.remove();
+                            // التحقق مما إذا كانت القائمة فارغة
+                            if (document.querySelectorAll('.movie-card').length === 0) {
+                                location.reload(); // تحديث الصفحة لعرض رسالة القائمة الفارغة
+                            }
+                        }, 300);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    });
+    </script>
+</body>
+</html>

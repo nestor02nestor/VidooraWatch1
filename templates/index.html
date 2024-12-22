@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موقع الأفلام والمسلسلات</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .swiper {
+            width: 100%;
+            height: 85vh;
+            background-color: #141414;
+        }
+        .swiper-slide {
+            position: relative;
+            overflow: hidden;
+        }
+        .slide-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-size: cover;
+            background-position: center;
+            transform: scale(1.1);
+            transition: transform 2s ease;
+        }
+        .swiper-slide-active .slide-background {
+            transform: scale(1);
+        }
+        .slide-background::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.2) 100%),
+                        linear-gradient(0deg, #141414 0%, rgba(20,20,20,0) 50%);
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+        .swiper-slide-active .slide-background::after {
+            opacity: 1;
+        }
+        .slide-content {
+            position: absolute;
+            bottom: 15%;
+            right: 8%;
+            z-index: 1;
+            color: white;
+            max-width: 600px;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease 0.3s;
+        }
+        .swiper-slide-active .slide-content {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .slide-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            line-height: 1.2;
+        }
+        .slide-description {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        .slide-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        .btn-netflix {
+            background-color: #e50914;
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-netflix:hover {
+            background-color: #f40612;
+            color: white;
+            transform: scale(1.05);
+        }
+        .btn-outline-light {
+            border: 2px solid white;
+            padding: 0.8rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-outline-light:hover {
+            background-color: rgba(255,255,255,0.2);
+            transform: scale(1.05);
+        }
+        .swiper-button-next,
+        .swiper-button-prev {
+            color: white;
+            background-color: rgba(0,0,0,0.5);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        .swiper-button-next:hover,
+        .swiper-button-prev:hover {
+            background-color: rgba(229,9,20,0.8);
+        }
+        .swiper-button-next::after,
+        .swiper-button-prev::after {
+            font-size: 1.5rem;
+        }
+        .swiper-pagination-bullet {
+            width: 12px;
+            height: 12px;
+            background-color: white;
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+        .swiper-pagination-bullet-active {
+            opacity: 1;
+            background-color: #e50914;
+            transform: scale(1.2);
+        }
+        .movie-section {
+            padding: 2rem 0;
+            overflow: visible;
+        }
+        .section-header {
+            margin-bottom: 2rem;
+            padding: 0 2rem;
+        }
+        .section-title {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 0;
+        }
+        .slider-navigation {
+            display: flex;
+            gap: 1rem;
+        }
+        .nav-btn {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .nav-btn:hover {
+            background-color: #e50914;
+            transform: scale(1.1);
+        }
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .movies-slider {
+            position: relative;
+            overflow: hidden;
+            padding: 1rem 2rem;
+            margin: 0 -2rem;
+        }
+        .movies-track {
+            display: flex;
+            gap: 1.5rem;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .movie-item {
+            flex: 0 0 240px;
+            perspective: 1000px;
+        }
+        .movie-card {
+            position: relative;
+            width: 100%;
+            height: 360px;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .movie-item:hover .movie-card {
+            transform: scale(1.05);
+        }
+        .movie-poster {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .movie-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .movie-item:hover .movie-poster img {
+            transform: scale(1.1);
+        }
+        .movie-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, 
+                rgba(0, 0, 0, 0.9) 0%,
+                rgba(0, 0, 0, 0.6) 50%,
+                rgba(0, 0, 0, 0.4) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 1.5rem;
+        }
+        .movie-item:hover .movie-overlay {
+            opacity: 1;
+        }
+        .movie-title {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        .movie-desc {
+            color: #e6e6e6;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        .movie-actions {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: auto;
+        }
+        .btn-watch {
+            background-color: #e50914;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 4px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .btn-watch:hover {
+            background-color: #f40612;
+            transform: scale(1.05);
+        }
+        .btn-info {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .btn-info:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+        .category-slider {
+            height: auto;
+            padding: 20px 50px;
+            margin: 0 -50px;
+        }
+        .category-slider .swiper-slide {
+            width: 220px;
+            transition: transform 0.3s ease;
+        }
+        .category-slider .swiper-slide:hover {
+            transform: scale(1.1) translateY(-10px);
+            z-index: 1;
+        }
+        .category-slider .swiper-button-next,
+        .category-slider .swiper-button-prev {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        .category-slider:hover .swiper-button-next,
+        .category-slider:hover .swiper-button-prev {
+            opacity: 1;
+        }
+        .category-slider .swiper-button-next:hover,
+        .category-slider .swiper-button-prev:hover {
+            background-color: rgba(229, 9, 20, 0.8);
+            transform: scale(1.1);
+        }
+        .category-slider .swiper-button-next::after,
+        .category-slider .swiper-button-prev::after {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+        }
+        .category-slider .swiper-button-disabled {
+            display: none;
+        }
+        .movies-slider {
+            position: relative;
+            overflow: hidden;
+        }
+        .movies-track {
+            display: flex;
+            gap: 20px;
+            transition: transform 0.5s ease;
+        }
+        .movie-item {
+            flex-shrink: 0;
+            width: 220px;
+        }
+        .movie-poster {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+        .movie-poster img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+            border-radius: 8px;
+        }
+        .movie-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .movie-poster:hover .movie-overlay {
+            opacity: 1;
+        }
+        .overlay-content {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            color: white;
+        }
+        .movie-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .movie-desc {
+            font-size: 0.9rem;
+            color: #ccc;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .movie-actions {
+            margin-top: 1rem;
+        }
+        .btn-watch {
+            background-color: #e50914;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-watch:hover {
+            background-color: #f40612;
+            color: white;
+            transform: scale(1.05);
+        }
+        .btn-info {
+            border: 2px solid white;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-info:hover {
+            background-color: rgba(255,255,255,0.2);
+            transform: scale(1.05);
+        }
+        .nav-btn {
+            background-color: rgba(0, 0, 0, 0.5);
+            border: none;
+            padding: 0.5rem 1rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .nav-btn:hover {
+            background-color: rgba(229, 9, 20, 0.8);
+            transform: scale(1.1);
+        }
+        .modal-content.bg-dark {
+            background-color: #181818 !important;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .modal-header {
+            padding: 1.5rem;
+        }
+        .modal-body {
+            padding: 0 1.5rem 1.5rem 1.5rem;
+        }
+        .modal-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        .movie-details {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .movie-details p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #e6e6e6;
+        }
+        .movie-meta {
+            margin-top: auto;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: #e6e6e6;
+        }
+        .meta-item i {
+            font-size: 1.2rem;
+            color: #e50914;
+        }
+        .modal .btn-watch {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: #e50914;
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 4px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .modal .btn-watch:hover {
+            background-color: #f40612;
+            transform: scale(1.05);
+        }
+        .modal .btn-watch i {
+            font-size: 1.2rem;
+        }
+        .modal-dialog {
+            max-width: 800px;
+        }
+        .modal-content {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        #modalMovieImage {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .btn-close-white {
+            background-color: rgba(255,255,255,0.2);
+            padding: 1rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        .btn-close-white:hover {
+            background-color: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+
+        .movies-row {
+            position: relative;
+            margin: 0 -10px;
+            overflow: hidden;
+        }
+
+        .movies-slider {
+            display: flex;
+            gap: 20px;
+            transition: transform 0.3s ease;
+            padding: 10px;
+        }
+
+        .movie-card {
+            flex: 0 0 calc(20% - 16px);
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .movie-poster {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 2/3;
+        }
+
+        .movie-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .movie-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.3) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: flex-end;
+            padding: 20px;
+        }
+
+        .movie-card:hover .movie-overlay {
+            opacity: 1;
+        }
+
+        .movie-card:hover .movie-poster img {
+            transform: scale(1.1);
+        }
+
+        .movie-info {
+            width: 100%;
+            text-align: center;
+        }
+
+        .movie-info h3 {
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .movie-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        @media (max-width: 1200px) {
+            .movie-card {
+                flex: 0 0 calc(25% - 15px);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .movie-card {
+                flex: 0 0 calc(33.333% - 14px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .movie-card {
+                flex: 0 0 calc(50% - 10px);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .movie-card {
+                flex: 0 0 calc(100% - 20px);
+            }
+        }
+        
+        .movie-rating {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #ffd700;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand" href="{{ url_for('index') }}">موقع الأفلام</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('index') }}">الرئيسية</a>
+                    </li>
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('user_watchlist') }}">
+                            <i class="bi bi-bookmark"></i>
+                            قائمة المشاهدة
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('user_notifications') }}">
+                            <i class="bi bi-bell"></i>
+                            الإشعارات
+                            <span class="badge bg-danger notifications-count" style="display: none;">0</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% for category in categories %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('category', id=category.id) }}">{{ category.name }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <div class="search-container">
+                    <input type="text" class="search-box" placeholder="ابحث عن فيلم..." id="searchInput">
+                    <i class="bi bi-search search-icon"></i>
+                    <div class="search-results" id="searchResults">
+                        <!-- نتائج البحث ستظهر هنا -->
+                    </div>
+                </div>
+                <ul class="navbar-nav">
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_dashboard') }}">لوحة التحكم</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('logout') }}">تسجيل الخروج</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('login') }}">تسجيل الدخول</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('register') }}">التسجيل</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Featured Movies Slider -->
+    {% if featured_movies %}
+    <div class="swiper featured-slider">
+        <div class="swiper-wrapper">
+            {% for movie in featured_movies %}
+            <div class="swiper-slide" data-swiper-parallax="-300">
+                <div class="slide-background" style="background-image: url('{{ movie.image_url }}')"></div>
+                <div class="slide-content" data-swiper-parallax="-200">
+                    <h1 class="slide-title" data-swiper-parallax="-400">{{ movie.title }}</h1>
+                    <p class="slide-description" data-swiper-parallax="-300">{{ movie.description }}</p>
+                    <div class="slide-buttons" data-swiper-parallax="-200">
+                        <a href="{{ url_for('watch', id=movie.id) }}" class="btn btn-netflix">
+                            <i class="bi bi-play-fill"></i> مشاهدة الآن
+                        </a>
+                        <button class="btn btn-outline-light ms-2">
+                            <i class="bi bi-info-circle"></i> المزيد من المعلومات
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="swiper-pagination"></div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+    </div>
+    {% endif %}
+
+    <div class="container-fluid px-4 mt-5 pt-4">
+        {% for category, movies in movies_by_category.items() %}
+        <div class="category-section mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-white">{{ category.name }}</h2>
+                <a href="{{ url_for('category', id=category.id) }}" class="btn btn-outline-light">
+                    عرض الكل
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+            </div>
+            
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
+                {% for movie in movies %}
+                <div class="col">
+                    <div class="movie-card">
+                        <div class="movie-poster">
+                            <a href="{{ url_for('watch', id=movie.id) }}">
+                                {% if movie.average_rating > 0 %}
+                                <div class="movie-rating">
+                                    <i class="bi bi-star-fill"></i> {{ "%.1f"|format(movie.average_rating) }}
+                                </div>
+                                {% endif %}
+                                <img src="{{ movie.image_url }}" alt="{{ movie.title }}" loading="lazy">
+                            </a>
+                            <div class="movie-overlay">
+                                <div class="movie-info">
+                                    <h3>{{ movie.title }}</h3>
+                                    <div class="movie-buttons">
+                                        <a href="{{ url_for('watch', id=movie.id) }}" class="btn btn-watch">
+                                            <i class="bi bi-play-fill"></i>
+                                            <span>مشاهدة</span>
+                                        </a>
+                                        {% if current_user.is_authenticated %}
+                                        <button class="btn btn-outline-light toggle-watchlist" 
+                                                data-movie-id="{{ movie.id }}"
+                                                data-in-watchlist="{{ 'true' if movie in current_user.watchlist else 'false' }}">
+                                            <i class="bi bi-bookmark{% if movie in current_user.watchlist %}-fill{% endif %}"></i>
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="text-center text-white mt-5">
+            <i class="bi bi-film display-1 mb-3"></i>
+            <h2>لا توجد أفلام حالياً</h2>
+            <p>لم يتم إضافة أي أفلام بعد</p>
+            {% if current_user.is_authenticated and current_user.is_admin %}
+            <a href="{{ url_for('add_movie') }}" class="btn btn-primary mt-3">
+                <i class="bi bi-plus-lg"></i>
+                إضافة فيلم جديد
+            </a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Movie Details Modal -->
+    <div class="modal fade" id="movieDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title text-white" id="modalMovieTitle"></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img id="modalMovieImage" class="img-fluid rounded" src="" alt="">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="movie-details text-white">
+                                <p id="modalMovieDesc" class="mb-4"></p>
+                                <div class="movie-meta">
+                                    <div class="meta-item mb-3">
+                                        <i class="bi bi-calendar3"></i>
+                                        <span id="modalMovieYear"></span>
+                                    </div>
+                                    <div class="meta-item mb-3">
+                                        <i class="bi bi-tag"></i>
+                                        <span id="modalMovieCategory"></span>
+                                    </div>
+                                </div>
+                                <a id="modalWatchButton" href="" class="btn btn-watch mt-3">
+                                    <i class="bi bi-play-fill"></i>
+                                    <span>مشاهدة الآن</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
+    <script>
+        // Initialize Swiper
+        const swiper = new Swiper('.featured-slider', {
+            effect: 'fade',
+            speed: 1000,
+            autoplay: {
+                delay: 5000,
+                disableOnInteraction: false,
+            },
+            parallax: true,
+            loop: true,
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            on: {
+                slideChangeTransitionStart: function() {
+                    const activeSlide = this.slides[this.activeIndex];
+                    const prevSlide = this.slides[this.previousIndex];
+                    
+                    if (prevSlide) {
+                        const prevBackground = prevSlide.querySelector('.slide-background');
+                        if (prevBackground) {
+                            prevBackground.style.transform = 'scale(1.1)';
+                        }
+                    }
+                },
+                slideChangeTransitionEnd: function() {
+                    const activeSlide = this.slides[this.activeIndex];
+                    const background = activeSlide.querySelector('.slide-background');
+                    if (background) {
+                        background.style.transform = 'scale(1)';
+                    }
+                }
+            }
+        });
+
+        // Initialize category sliders
+        const categorySliders = document.querySelectorAll('.movies-slider');
+        categorySliders.forEach(slider => {
+            const track = slider.querySelector('.movies-track');
+            const prevBtn = slider.parentElement.querySelector('.prev-btn');
+            const nextBtn = slider.parentElement.querySelector('.next-btn');
+            
+            let isDragging = false;
+            let startPos = 0;
+            let currentTranslate = 0;
+            let prevTranslate = 0;
+            
+            // Calculate visible slides based on viewport width
+            const getVisibleSlides = () => {
+                const viewportWidth = window.innerWidth;
+                if (viewportWidth < 576) return 2;
+                if (viewportWidth < 768) return 3;
+                if (viewportWidth < 992) return 4;
+                if (viewportWidth < 1200) return 5;
+                return 6;
+            };
+
+            const updateSliderPosition = () => {
+                track.style.transform = `translateX(${currentTranslate}px)`;
+                checkButtons();
+            };
+
+            const checkButtons = () => {
+                const slideWidth = 240 + 24; // width + gap
+                const maxSlides = track.children.length;
+                const visibleSlides = getVisibleSlides();
+                const maxTranslate = -(maxSlides - visibleSlides) * slideWidth;
+
+                prevBtn.disabled = currentTranslate >= 0;
+                nextBtn.disabled = currentTranslate <= maxTranslate;
+
+                // Update button opacity based on state
+                prevBtn.style.opacity = prevBtn.disabled ? '0.5' : '1';
+                nextBtn.style.opacity = nextBtn.disabled ? '0.5' : '1';
+            };
+
+            const moveSlider = (direction) => {
+                const slideWidth = 240 + 24; // width + gap
+                const visibleSlides = getVisibleSlides();
+                const maxSlides = track.children.length;
+                const maxTranslate = -(maxSlides - visibleSlides) * slideWidth;
+
+                if (direction === 'prev') {
+                    currentTranslate = Math.min(currentTranslate + slideWidth * visibleSlides, 0);
+                } else {
+                    currentTranslate = Math.max(currentTranslate - slideWidth * visibleSlides, maxTranslate);
+                }
+
+                track.style.transform = `translateX(${currentTranslate}px)`;
+                checkButtons();
+            };
+
+            // Mouse events for drag functionality
+            track.addEventListener('mousedown', e => {
+                isDragging = true;
+                startPos = e.clientX - currentTranslate;
+                track.style.cursor = 'grabbing';
+                track.style.transition = 'none';
+            });
+
+            track.addEventListener('mousemove', e => {
+                if (!isDragging) return;
+                const currentPosition = e.clientX - startPos;
+                currentTranslate = currentPosition;
+                updateSliderPosition();
+            });
+
+            track.addEventListener('mouseup', () => {
+                isDragging = false;
+                track.style.cursor = 'grab';
+                track.style.transition = 'transform 0.5s ease';
+                snapToSlide();
+            });
+
+            track.addEventListener('mouseleave', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    track.style.cursor = 'grab';
+                    track.style.transition = 'transform 0.5s ease';
+                    snapToSlide();
+                }
+            });
+
+            const snapToSlide = () => {
+                const slideWidth = 240 + 24;
+                const visibleSlides = getVisibleSlides();
+                const maxSlides = track.children.length;
+                const maxTranslate = -(maxSlides - visibleSlides) * slideWidth;
+                
+                // Snap to nearest slide
+                currentTranslate = Math.round(currentTranslate / slideWidth) * slideWidth;
+                
+                // Ensure we don't go beyond bounds
+                currentTranslate = Math.max(Math.min(currentTranslate, 0), maxTranslate);
+                
+                updateSliderPosition();
+            };
+
+            // Button click events
+            prevBtn.addEventListener('click', () => moveSlider('prev'));
+            nextBtn.addEventListener('click', () => moveSlider('next'));
+
+            // Initialize button states
+            checkButtons();
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                checkButtons();
+            });
+        });
+
+        // Navbar background change on scroll
+        $(window).scroll(function() {
+            if ($(window).scrollTop() > 50) {
+                $('.navbar').addClass('scrolled');
+            } else {
+                $('.navbar').removeClass('scrolled');
+            }
+        });
+
+        // Horizontal scroll for movie rows
+        $('.movie-row').each(function() {
+            $(this).on('wheel', function(e) {
+                if (e.originalEvent.deltaY !== 0) {
+                    e.preventDefault();
+                    $(this).scrollLeft($(this).scrollLeft() + e.originalEvent.deltaY);
+                }
+            });
+        });
+
+        // Movie details modal
+        const movieDetailsModal = document.getElementById('movieDetailsModal');
+        const modalMovieTitle = document.getElementById('modalMovieTitle');
+        const modalMovieImage = document.getElementById('modalMovieImage');
+        const modalMovieDesc = document.getElementById('modalMovieDesc');
+        const modalMovieYear = document.getElementById('modalMovieYear');
+        const modalMovieCategory = document.getElementById('modalMovieCategory');
+        const modalWatchButton = document.getElementById('modalWatchButton');
+
+        movieDetailsModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const movieId = button.getAttribute('data-movie-id');
+            const movieTitle = button.getAttribute('data-movie-title');
+            const movieImage = button.getAttribute('data-movie-image');
+            const movieDesc = button.getAttribute('data-movie-desc');
+            const movieYear = button.getAttribute('data-movie-year');
+            const movieCategory = button.getAttribute('data-movie-category');
+            const movieWatchUrl = button.getAttribute('data-movie-watch-url');
+
+            // Reset opacity for animation
+            modalMovieTitle.style.opacity = '0';
+            modalMovieImage.style.opacity = '0';
+            modalMovieDesc.style.opacity = '0';
+            modalMovieYear.parentElement.style.opacity = '0';
+            modalMovieCategory.parentElement.style.opacity = '0';
+            modalWatchButton.style.opacity = '0';
+
+            // Set content
+            modalMovieTitle.textContent = movieTitle;
+            modalMovieImage.src = movieImage;
+            modalMovieDesc.textContent = movieDesc;
+            modalMovieYear.textContent = movieYear || 'غير محدد';
+            modalMovieCategory.textContent = movieCategory;
+            modalWatchButton.href = movieWatchUrl;
+
+            // Animate content
+            setTimeout(() => {
+                modalMovieTitle.style.transition = 'opacity 0.3s ease';
+                modalMovieTitle.style.opacity = '1';
+            }, 100);
+
+            setTimeout(() => {
+                modalMovieImage.style.transition = 'opacity 0.3s ease';
+                modalMovieImage.style.opacity = '1';
+            }, 200);
+
+            setTimeout(() => {
+                modalMovieDesc.style.transition = 'opacity 0.3s ease';
+                modalMovieDesc.style.opacity = '1';
+            }, 300);
+
+            setTimeout(() => {
+                modalMovieYear.parentElement.style.transition = 'opacity 0.3s ease';
+                modalMovieYear.parentElement.style.opacity = '1';
+            }, 400);
+
+            setTimeout(() => {
+                modalMovieCategory.parentElement.style.transition = 'opacity 0.3s ease';
+                modalMovieCategory.parentElement.style.opacity = '1';
+            }, 500);
+
+            setTimeout(() => {
+                modalWatchButton.style.transition = 'opacity 0.3s ease';
+                modalWatchButton.style.opacity = '1';
+            }, 600);
+        });
+
+        movieDetailsModal.addEventListener('hidden.bs.modal', function() {
+            // Reset transitions
+            const elements = [
+                modalMovieTitle,
+                modalMovieImage,
+                modalMovieDesc,
+                modalMovieYear.parentElement,
+                modalMovieCategory.parentElement,
+                modalWatchButton
+            ];
+            
+            elements.forEach(element => {
+                element.style.transition = 'none';
+                element.style.opacity = '0';
+            });
+        });
+
+        // Search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const searchResults = document.getElementById('searchResults');
+            let searchTimeout;
+
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                const query = this.value.trim();
+                
+                if (query.length < 2) {
+                    searchResults.classList.remove('active');
+                    return;
+                }
+
+                searchTimeout = setTimeout(() => {
+                    fetch(`/search?q=${encodeURIComponent(query)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            searchResults.innerHTML = '';
+                            if (data.length > 0) {
+                                data.forEach(movie => {
+                                    const resultItem = document.createElement('a');
+                                    resultItem.href = `/watch/${movie.id}`;
+                                    resultItem.className = 'search-result-item';
+                                    resultItem.innerHTML = `
+                                        <img src="${movie.image_url}" alt="${movie.title}">
+                                        <div class="search-result-info">
+                                            <div class="search-result-title">${movie.title}</div>
+                                            <div class="search-result-meta">
+                                                ${movie.category.name} • ${movie.release_date}
+                                            </div>
+                                        </div>
+                                    `;
+                                    searchResults.appendChild(resultItem);
+                                });
+                                searchResults.classList.add('active');
+                            } else {
+                                searchResults.innerHTML = '<div class="search-result-item">لا توجد نتائج</div>';
+                                searchResults.classList.add('active');
+                            }
+                        });
+                }, 300);
+            });
+
+            // Hide search results when clicking outside search area
+            document.addEventListener('click', function(e) {
+                if (!searchResults.contains(e.target) && e.target !== searchInput) {
+                    searchResults.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

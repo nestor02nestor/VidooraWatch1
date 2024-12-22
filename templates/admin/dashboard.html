@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-white mb-4">لوحة التحكم</h1>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-dark text-white">
+                <div class="card-body">
+                    <h5 class="card-title">الأفلام</h5>
+                    <p class="card-text display-4">{{ movies_count }}</p>
+                    <a href="{{ url_for('admin_movies') }}" class="btn btn-outline-light">إدارة الأفلام</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark text-white">
+                <div class="card-body">
+                    <h5 class="card-title">الأقسام</h5>
+                    <p class="card-text display-4">{{ categories_count }}</p>
+                    <a href="{{ url_for('admin_categories') }}" class="btn btn-outline-light">إدارة الأقسام</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark text-white">
+                <div class="card-body">
+                    <h5 class="card-title">المستخدمين</h5>
+                    <p class="card-text display-4">{{ users_count }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-end">
+                <a href="{{ url_for('add_movie') }}" class="btn btn-primary me-2">
+                    <i class="bi bi-plus-lg"></i>
+                    إضافة فيلم جديد
+                </a>
+                <a href="{{ url_for('add_category') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg"></i>
+                    إضافة قسم جديد
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: translateY(-5px);
+}
+</style>
+{% endblock %}

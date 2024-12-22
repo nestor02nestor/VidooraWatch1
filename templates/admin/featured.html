@@ -1,0 +1,62 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">إدارة الأفلام المميزة</h1>
+    <p class="mb-4">اختر الأفلام التي ستظهر في السلايدر العلوي (الحد الأقصى 10 أفلام)</p>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card admin-card">
+                <div class="card-header">
+                    <h5 class="mb-0">الأفلام المميزة</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover">
+                            <thead>
+                                <tr>
+                                    <th>الصورة</th>
+                                    <th>العنوان</th>
+                                    <th>التصنيف</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for movie in movies %}
+                                <tr>
+                                    <td>
+                                        <img src="{{ movie.image_url }}" alt="{{ movie.title }}" style="width: 50px; height: 50px; object-fit: cover;">
+                                    </td>
+                                    <td>{{ movie.title }}</td>
+                                    <td>{{ movie.category.name }}</td>
+                                    <td>
+                                        {% if movie.featured %}
+                                        <span class="badge bg-success">مميز</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">غير مميز</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form action="{{ url_for('toggle_featured', id=movie.id) }}" method="POST" style="display: inline;">
+                                            <button type="submit" class="btn btn-sm {% if movie.featured %}btn-danger{% else %}btn-success{% endif %}">
+                                                {% if movie.featured %}
+                                                إلغاء التمييز
+                                                {% else %}
+                                                تمييز
+                                                {% endif %}
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

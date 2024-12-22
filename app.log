@@ -1,0 +1,119 @@
+2024-12-17 21:23:45,525 INFO: تم إنشاء قاعدة البيانات بنجاح
+2024-12-17 21:24:11,710 INFO: تم إنشاء قاعدة البيانات بنجاح
+2024-12-17 21:24:11,867 INFO: بدء تهيئة التطبيق...
+2024-12-17 21:24:11,875 INFO: جاري إنشاء الجداول...
+2024-12-17 21:24:11,943 INFO: تم إنشاء الجداول بنجاح
+2024-12-17 21:24:12,009 ERROR: خطأ في تشغيل التطبيق: Error creating backref 'category' on relationship 'Category.movies': property of that name exists on mapper 'Mapper[Movie(movie)]'
+Traceback (most recent call last):
+  File "c:\Users\atef\CascadeProjects\movies_website\app.py", line 349, in <module>
+    if not User.query.filter_by(username='admin').first():
+           ^^^^^^^^^^
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask_sqlalchemy\model.py", line 22, in __get__
+    return cls.query_class(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\query.py", line 275, in __init__
+    self._set_entities(entities)
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\query.py", line 288, in _set_entities
+    coercions.expect(
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\coercions.py", line 389, in expect
+    insp._post_inspect
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 1253, in __get__
+    obj.__dict__[self.__name__] = result = self.fget(obj)
+                                           ^^^^^^^^^^^^^^
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\mapper.py", line 2711, in _post_inspect
+    self._check_configure()
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\mapper.py", line 2388, in _check_configure
+    _configure_registries({self.registry}, cascade=True)
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\mapper.py", line 4204, in _configure_registries
+    _do_configure_registries(registries, cascade)
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\mapper.py", line 4245, in _do_configure_registries
+    mapper._post_configure_properties()
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\mapper.py", line 2405, in _post_configure_properties
+    prop.init()
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\interfaces.py", line 584, in init
+    self.do_init()
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\relationships.py", line 1647, in do_init
+    self._generate_backref()
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\relationships.py", line 2075, in _generate_backref
+    raise sa_exc.ArgumentError(
+sqlalchemy.exc.ArgumentError: Error creating backref 'category' on relationship 'Category.movies': property of that name exists on mapper 'Mapper[Movie(movie)]'
+
+2024-12-17 21:25:11,880 INFO: تم إنشاء قاعدة البيانات بنجاح
+2024-12-17 21:25:11,962 INFO: بدء تهيئة التطبيق...
+2024-12-17 21:25:11,963 INFO: جاري إنشاء الجداول...
+2024-12-17 21:25:11,970 INFO: تم إنشاء الجداول بنجاح
+2024-12-17 21:25:12,025 ERROR: خطأ في تشغيل التطبيق: Error creating backref 'category' on relationship 'Category.movies': property of that name exists on mapper 'Mapper[Movie(movie)]'
+Traceback (most recent call last):
+  File "C:\Users\atef\CascadeProjects\movies_website\app.py", line 349, in <module>
+    if not User.query.filter_by(username='admin').first():
+           ^^^^^^^^^^
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask_sqlalchemy\model.py", line 22, in __get__
+    return cls.query_class(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\query.py", line 275, in __init__
+    self._set_entities(entities)
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\query.py", line 288, in _set_entities
+    coercions.expect(
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\coercions.py", line 389, in expect
+    insp._post_inspect
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 1253, in __get__
+    obj.__dict__[self.__name__] = result = self.fget(obj)
+                                           ^^^^^^^^^^^^^^
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\mapper.py", line 2711, in _post_inspect
+    self._check_configure()
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\mapper.py", line 2388, in _check_configure
+    _configure_registries({self.registry}, cascade=True)
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\mapper.py", line 4204, in _configure_registries
+    _do_configure_registries(registries, cascade)
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\mapper.py", line 4245, in _do_configure_registries
+    mapper._post_configure_properties()
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\mapper.py", line 2405, in _post_configure_properties
+    prop.init()
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\interfaces.py", line 584, in init
+    self.do_init()
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\relationships.py", line 1647, in do_init
+    self._generate_backref()
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\relationships.py", line 2075, in _generate_backref
+    raise sa_exc.ArgumentError(
+sqlalchemy.exc.ArgumentError: Error creating backref 'category' on relationship 'Category.movies': property of that name exists on mapper 'Mapper[Movie(movie)]'
+
+2024-12-17 21:25:48,562 INFO: تم إنشاء قاعدة البيانات بنجاح
+2024-12-17 21:25:48,604 INFO: بدء تهيئة التطبيق...
+2024-12-17 21:25:48,620 INFO: جاري إنشاء الجداول...
+2024-12-17 21:25:48,620 INFO: تم إنشاء الجداول بنجاح
+2024-12-17 21:25:48,670 ERROR: خطأ في تشغيل التطبيق: Error creating backref 'category' on relationship 'Category.movies': property of that name exists on mapper 'Mapper[Movie(movie)]'
+Traceback (most recent call last):
+  File "C:\Users\atef\CascadeProjects\movies_website\app.py", line 349, in <module>
+    if not User.query.filter_by(username='admin').first():
+           ^^^^^^^^^^
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask_sqlalchemy\model.py", line 22, in __get__
+    return cls.query_class(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\query.py", line 275, in __init__
+    self._set_entities(entities)
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\query.py", line 288, in _set_entities
+    coercions.expect(
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\coercions.py", line 389, in expect
+    insp._post_inspect
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 1253, in __get__
+    obj.__dict__[self.__name__] = result = self.fget(obj)
+                                           ^^^^^^^^^^^^^^
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\mapper.py", line 2711, in _post_inspect
+    self._check_configure()
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\mapper.py", line 2388, in _check_configure
+    _configure_registries({self.registry}, cascade=True)
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\mapper.py", line 4204, in _configure_registries
+    _do_configure_registries(registries, cascade)
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\mapper.py", line 4245, in _do_configure_registries
+    mapper._post_configure_properties()
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\mapper.py", line 2405, in _post_configure_properties
+    prop.init()
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\interfaces.py", line 584, in init
+    self.do_init()
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\relationships.py", line 1647, in do_init
+    self._generate_backref()
+  File "C:\Users\atef\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\relationships.py", line 2075, in _generate_backref
+    raise sa_exc.ArgumentError(
+sqlalchemy.exc.ArgumentError: Error creating backref 'category' on relationship 'Category.movies': property of that name exists on mapper 'Mapper[Movie(movie)]'
+
+2024-12-17 21:25:54,244 INFO: تم إنشاء قاعدة البيانات بنجاح

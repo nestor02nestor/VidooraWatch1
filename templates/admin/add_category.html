@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-dark text-white">
+                <div class="card-header">
+                    <h4 class="mb-0">إضافة قسم جديد</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">اسم القسم</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('admin_categories') }}" class="btn btn-secondary">رجوع</a>
+                            <button type="submit" class="btn btn-primary">إضافة القسم</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
